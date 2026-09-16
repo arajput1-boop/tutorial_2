@@ -1,0 +1,266 @@
+/* ============================================
+   0. RESET + BOX MODEL
+   border-box means padding and border are
+   counted INSIDE an element's declared width,
+   instead of adding to it. This is what keeps
+   .card at a predictable width once we give it
+   padding and a border below.
+============================================ */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+}
+
+:root {
+  --ink:      #1B1B1B;
+  --muted:    #6B6B6B;
+  --line:     #E3E1DC;
+  --paper:    #F6F4EF;
+  --card-bg:  #FFFFFF;
+  --thumb:    #D9D9D9;
+  --accent:   #2F5D50;
+}
+
+body {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  color: var(--ink);
+  background: var(--paper);
+}
+
+/* ============================================
+   1. PAGE LAYOUT: CSS GRID
+   Grid lays out the page's structural regions —
+   header, hero, the card list, footer — as rows
+   in one column. Grid is the right tool for this
+   level because these are fixed, named regions,
+   not a fluid run of repeating items.
+============================================ */
+.page-layout {
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+  grid-template-areas:
+    "header"
+    "hero"
+    "list"
+    "footer";
+  min-height: 100vh;
+}
+
+.site-header  { grid-area: header; }
+.hero-section { grid-area: hero; }
+.list-section { grid-area: list; }
+.site-footer  { grid-area: footer; }
+
+/* ---- Header ---- */
+.site-header {
+  background: var(--card-bg);
+  border-bottom: 1px solid var(--line);
+  padding: 1rem 2rem;
+}
+
+/* Flexbox handles the fluid row inside the nav:
+   logo on one side, links on the other, wrapping
+   if the window gets tight. */
+.header-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+.logo {
+  font-weight: 700;
+  font-size: 1.15rem;
+}
+.nav-links {
+  display: flex;
+  list-style: none;
+  gap: 1.5rem;
+  margin: 0;
+  padding: 0;
+}
+.nav-links a {
+  color: var(--ink);
+  text-decoration: none;
+  font-size: 0.95rem;
+}
+.nav-links a:hover,
+.nav-links a:focus-visible {
+  color: var(--accent);
+}
+
+/* ---- Hero ---- */
+.hero-section {
+  padding: 2.5rem 2rem 1.5rem;
+  max-width: 1100px;
+  margin: 0 auto;
+  width: 100%;
+}
+.hero-section h1 {
+  margin: 0 0 0.5rem;
+  font-size: clamp(1.6rem, 2vw + 1rem, 2.2rem);
+}
+.hero-section p {
+  margin: 0;
+  color: var(--muted);
+  max-width: 60ch;
+}
+
+/* ============================================
+   2. THE REPEATING COMPONENT: FLEXBOX
+   Mobile-first: .list-section is a flex COLUMN
+   by default, so the three cards stack on small
+   screens. At the "large" breakpoint below, we
+   flip flex-direction to row and give each card
+   equal flex-grow (flex: 1 1 0) so it's always
+   exactly three across — never 2-then-1 — rather
+   than leaving it to wrap on its own.
+============================================ */
+.list-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 1.5rem 2rem 3rem;
+  max-width: 1100px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.card {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;   /* nested flex: stack this card's own children */
+  gap: 0.9rem;
+  background: var(--card-bg);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 1.25rem;
+}
+
+/* Card header: image + title on the left,
+   author on the right — a flex row that itself
+   contains a flex row (card-header-left) */
+.card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: nowrap;
+}
+.card-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+.card-thumb {
+  flex-shrink: 0;
+  width: 64px;
+  height: 64px;
+  border-radius: 10px;
+  background: var(--thumb);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #9C9C9C;
+  font-size: 1.3rem;
+}
+.card-title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+.card-title-group h2 {
+  margin: 0;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.3rem;
+}
+.card-date {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+.card-author {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.card-author i {
+  font-size: 1rem;
+}
+
+.card-body {
+  margin: 0;
+  font-family: 'Courier New', monospace;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: #333;
+  flex-grow: 1;    /* pushes the footer row to line up across all three cards */
+}
+
+/* Footer stats row: evenly spaced icon+label
+   pairs, another flex row nested inside the card */
+.card-footer {
+  display: flex;
+  gap: 1.25rem;
+  border-top: 1px solid var(--line);
+  padding-top: 0.9rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+  flex-wrap: wrap;
+}
+.card-footer span {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+/* ---- Site footer ---- */
+.site-footer {
+  background: var(--ink);
+  color: var(--paper);
+  padding: 1.25rem 2rem;
+  text-align: center;
+  font-size: 0.85rem;
+}
+.site-footer p {
+  margin: 0;
+}
+
+/* ============================================
+   3. RESPONSIVE: SMALL -> MEDIUM -> LARGE
+   Mobile-first, so the base styles above are the
+   small-screen version (column). Each media query
+   below adds on top of that as the screen grows.
+============================================ */
+
+/* Small screens (base / default, no query needed):
+   .list-section is already flex-direction: column,
+   so the three cards stack full-width. */
+
+/* Medium screens: a little breathing room, still
+   stacked — the row only kicks in at "large" below */
+@media (min-width: 600px) {
+  .hero-section,
+  .list-section {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+
+/* Large screens: flip the card list to a row and
+   make each card an equal third, so it's always
+   exactly 3-across rather than however many fit */
+@media (min-width: 900px) {
+  .list-section {
+    flex-direction: row;
+  }
+  .card {
+    flex: 1 1 0;
+  }
+}
